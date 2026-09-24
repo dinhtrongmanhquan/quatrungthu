@@ -871,20 +871,33 @@ window.addEventListener("keydown", (e) => {
 const bgm = document.getElementById("bgm");
 const audioBtn = document.getElementById("audio-btn");
 
-let audioStarted = false;
+let isPlaying = false;
 
-function startMusic() {
-  if (audioStarted) return;
-
-  bgm.play()
-    .then(() => {
-      audioStarted = true;
+// Lần đầu chạm vào trang → nhạc tự chạy
+window.addEventListener("pointerdown", () => {
+  if (!isPlaying) {
+    bgm.play().then(() => {
+      isPlaying = true;
       audioBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
-    })
-    .catch((error) => {
-      console.log("Không thể phát nhạc:", error);
-    });
-}
+    }).catch(() => {});
+  }
+}, { once: true });
+
+// Bấm nút 🎵 → bật / tắt nhạc
+audioBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+
+  if (bgm.paused) {
+    bgm.play();
+    isPlaying = true;
+    audioBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+  } else {
+    bgm.pause();
+    isPlaying = false;
+    audioBtn.innerHTML =
+      '<i class="fas fa-music" style="opacity:0.5;"></i>';
+  }
+});
 
 // Người dùng chạm/click lần đầu ở bất kỳ đâu → phát nhạc
 window.addEventListener("pointerdown", startMusic, {

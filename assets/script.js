@@ -867,42 +867,74 @@ window.addEventListener("keydown", (e) => {
   if (e.key === "Escape") closeWishCard();
 });
 
+// ===============================
 // AUDIO
+// ===============================
 const bgm = document.getElementById("bgm");
 const audioBtn = document.getElementById("audio-btn");
 
-let isPlaying = false;
+bgm.loop = true;
+bgm.preload = "auto";
+bgm.volume = 1;
 
-// Lần đầu chạm vào trang → nhạc tự chạy
-window.addEventListener("pointerdown", () => {
-  if (!isPlaying) {
-    bgm.play().then(() => {
-      isPlaying = true;
-      audioBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
-    }).catch(() => {});
-  }
-}, { once: true });
+function updateAudioButton() {
+    if (bgm.paused) {
+        audioBtn.innerHTML =
+            '<i class="fas fa-music" style="opacity:0.5;"></i>';
+        audioBtn.title = "Bật nhạc";
+    } else {
+        audioBtn.innerHTML =
+            '<i class="fas fa-volume-up"></i>';
+        audioBtn.title = "Tắt nhạc";
+    }
+}
 
-// Bấm nút 🎵 → bật / tắt nhạc
-audioBtn.addEventListener("click", (e) => {
-  e.stopPropagation();
+async function playMusic() {
+    try {
+        bgm.muted = false;
+        bgm.volume = 1;
 
-  if (bgm.paused) {
-    bgm.play();
-    isPlaying = true;
-    audioBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
-  } else {
-    bgm.pause();
-    isPlaying = false;
-    audioBtn.innerHTML =
-      '<i class="fas fa-music" style="opacity:0.5;"></i>';
-  }
+        await bgm.play();
+
+        console.log("✅ NHẠC ĐANG PHÁT");
+        updateAudioButton();
+
+    } catch (error) {
+        console.log("⚠️ Trình duyệt chặn autoplay:", error);
+        updateAudioButton();
+    }
+}
+
+// Nút nhạc
+audioBtn.addEventListener("click", async function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (bgm.paused) {
+        await playMusic();
+    } else {
+        bgm.pause();
+    }
+
+    updateAudioButton();
 });
 
-// Người dùng chạm/click lần đầu ở bất kỳ đâu → phát nhạc
-window.addEventListener("pointerdown", startMusic, {
-  passive: true
+// Theo dõi trạng thái
+bgm.addEventListener("play", updateAudioButton);
+bgm.addEventListener("pause", updateAudioButton);
+bgm.addEventListener("ended", updateAudioButton);
+
+bgm.addEventListener("error", function () {
+    console.error("❌ LỖI AUDIO:", bgm.error);
+    console.error("File:", bgm.currentSrc);
 });
+
+// Thử phát khi trang load
+window.addEventListener("load", function () {
+    playMusic();
+});
+
+updateAudioButton();
 
 // ANIMATION
 const clock = new THREE.Clock();

@@ -870,21 +870,25 @@ window.addEventListener("keydown", (e) => {
 // AUDIO
 const bgm = document.getElementById("bgm");
 const audioBtn = document.getElementById("audio-btn");
-let isPlaying = false;
 
-audioBtn.addEventListener("click", () => {
-  if (isPlaying) {
-    bgm.pause();
-    audioBtn.innerHTML = '<i class="fas fa-music" style="opacity:0.5;"></i>';
-  } else {
-    bgm
-      .play()
-      .then(() => {
-        audioBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
-      })
-      .catch(() => { });
-  }
-  isPlaying = !isPlaying;
+let audioStarted = false;
+
+function startMusic() {
+  if (audioStarted) return;
+
+  bgm.play()
+    .then(() => {
+      audioStarted = true;
+      audioBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+    })
+    .catch((error) => {
+      console.log("Không thể phát nhạc:", error);
+    });
+}
+
+// Người dùng chạm/click lần đầu ở bất kỳ đâu → phát nhạc
+window.addEventListener("pointerdown", startMusic, {
+  passive: true
 });
 
 // ANIMATION

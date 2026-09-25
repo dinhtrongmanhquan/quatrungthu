@@ -867,74 +867,48 @@ window.addEventListener("keydown", (e) => {
   if (e.key === "Escape") closeWishCard();
 });
 
-// ===============================
-// AUDIO
-// ===============================
+// ==================== AUDIO ====================
 const bgm = document.getElementById("bgm");
 const audioBtn = document.getElementById("audio-btn");
+let isPlaying = false;
 
-bgm.loop = true;
-bgm.preload = "auto";
-bgm.volume = 1;
-
-function updateAudioButton() {
-    if (bgm.paused) {
-        audioBtn.innerHTML =
-            '<i class="fas fa-music" style="opacity:0.5;"></i>';
-        audioBtn.title = "Bật nhạc";
-    } else {
-        audioBtn.innerHTML =
-            '<i class="fas fa-volume-up"></i>';
-        audioBtn.title = "Tắt nhạc";
-    }
+// Hàm hỗ trợ phát nhạc
+function playMusic() {
+  if (!isPlaying) {
+    bgm.play().then(() => {
+      isPlaying = true;
+      audioBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+    }).catch((err) => {
+      console.log("Trình duyệt chặn autoplay:", err);
+    });
+  }
 }
 
-async function playMusic() {
-    try {
-        bgm.muted = false;
-        bgm.volume = 1;
-
-        await bgm.play();
-
-        console.log("✅ NHẠC ĐANG PHÁT");
-        updateAudioButton();
-
-    } catch (error) {
-        console.log("⚠️ Trình duyệt chặn autoplay:", error);
-        updateAudioButton();
-    }
+// Khi người dùng bấm/chạm bất kỳ đâu lần đầu tiên -> Phát nhạc ngay
+function handleFirstInteraction() {
+  playMusic();
+  // Xóa sự kiện ngay sau khi đã phát để không gọi lại thừa
+  window.removeEventListener("click", handleFirstInteraction);
+  window.removeEventListener("touchstart", handleFirstInteraction);
+  window.removeEventListener("pointerdown", handleFirstInteraction);
 }
 
-// Nút nhạc
-audioBtn.addEventListener("click", async function (e) {
-    e.preventDefault();
-    e.stopPropagation();
+// Đăng ký sự kiện tương tác đầu tiên
+window.addEventListener("click", handleFirstInteraction);
+window.addEventListener("touchstart", handleFirstInteraction);
+window.addEventListener("pointerdown", handleFirstInteraction);
 
-    if (bgm.paused) {
-        await playMusic();
-    } else {
-        bgm.pause();
-    }
-
-    updateAudioButton();
-});
-
-// Theo dõi trạng thái
-bgm.addEventListener("play", updateAudioButton);
-bgm.addEventListener("pause", updateAudioButton);
-bgm.addEventListener("ended", updateAudioButton);
-
-bgm.addEventListener("error", function () {
-    console.error("❌ LỖI AUDIO:", bgm.error);
-    console.error("File:", bgm.currentSrc);
-});
-
-// Thử phát khi trang load
-window.addEventListener("load", function () {
+// Nút Bật/Tắt nhạc góc trên màn hình
+audioBtn.addEventListener("click", (e) => {
+  e.stopPropagation(); // Tránh bị dính sự kiện click toàn trang
+  if (isPlaying) {
+    bgm.pause();
+    audioBtn.innerHTML = '<i class="fas fa-music" style="opacity:0.5;"></i>';
+    isPlaying = false;
+  } else {
     playMusic();
+  }
 });
-
-updateAudioButton();
 
 // ANIMATION
 const clock = new THREE.Clock();

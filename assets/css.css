@@ -82,11 +82,9 @@ html {
 }
 
 .wish-card {
-  background: linear-gradient(
-    135deg,
-    rgba(35, 15, 45, 0.95),
-    rgba(15, 8, 25, 0.98)
-  );
+  background: linear-gradient(135deg,
+      rgba(35, 15, 45, 0.95),
+      rgba(15, 8, 25, 0.98));
   border: 1.5px solid rgba(255, 215, 0, 0.5);
   box-shadow:
     0 0 35px rgba(255, 182, 193, 0.3),
@@ -188,7 +186,7 @@ html {
   left: 50%;
   transform: translateX(-50%);
   z-index: 5;
-  color: rgba(255, 235, 205, 0.75);
+  color: rgba(255, 235, 205, 0.85);
   font-size: 13px;
   letter-spacing: 1px;
   pointer-events: none;
@@ -196,12 +194,14 @@ html {
   animation: pulseHint 2s infinite alternate;
   text-align: center;
   width: 90%;
+  line-height: 1.6;
 }
 
 @keyframes pulseHint {
   0% {
     opacity: 0.4;
   }
+
   100% {
     opacity: 0.95;
   }
